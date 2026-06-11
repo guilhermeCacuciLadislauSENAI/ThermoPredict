@@ -3,11 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController;
 
-Route::get('/', function () {
-    return view('login');
-})->name('login');
-
+Route::get('/', function () { return view('login'); })->name('login');
 Route::get('/login', function () { return redirect()->route('login'); });
 Route::get('/register', function () { return redirect()->route('login'); });
 
@@ -16,36 +14,30 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/aguardando-ativacao', function () {
-        return view('aguardando'); 
-    })->name('aguardando.ativacao');
+    Route::get('/aguardando-ativacao', function () { return view('aguardando'); })->name('aguardando.ativacao');
 
-    // --- Módulo Cliente ---
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::get('/novo-chamado', function () {
-        return view('form');
-    })->name('chamados.create');
+    // --- Módulo Cliente (B2B) ---
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    Route::post('/novo-chamado', function () {
-        return redirect()->route('suporte');
-    })->name('chamados.store');
-
-    Route::get('/suporte', function () {
-        return view('suporte');
-    })->name('suporte');
-
-    Route::get('/relatorios', function () {
-        return view('relatorios');
-    })->name('relatorios');
+    Route::get('/novo-chamado', function () { return view('form'); })->name('chamados.create');
+    Route::post('/novo-chamado', function () { return redirect()->route('suporte'); })->name('chamados.store');
+    Route::get('/suporte', function () { return view('suporte'); })->name('suporte');
+    Route::get('/relatorios', function () { return view('relatorios'); })->name('relatorios');
 
     // --- Módulo Admin ---
     Route::get('/admin/clientes', [AdminController::class, 'clientes'])->name('admin.clientes');
     Route::get('/admin/pendencias', [AdminController::class, 'pendencias'])->name('admin.pendencias');
     Route::post('/admin/aprovar/{id}', [AdminController::class, 'aprovar'])->name('admin.aprovar');
+    Route::get('/admin/empresa/{id}/dashboard', [AdminController::class, 'verGeladeiras'])->name('admin.empresa.dashboard');
 
-    // --- Sair ---
+    // ⚙️ Gestão de Hardware (Coolers e Sensores)
+    Route::get('/admin/empresa/{id}/novo-cooler', [AdminController::class, 'createCooler'])->name('admin.cooler.create');
+    Route::post('/admin/empresa/{id}/novo-cooler', [AdminController::class, 'storeCooler'])->name('admin.cooler.store');
+    
+    Route::get('/admin/cooler/{id}/gerenciar', [AdminController::class, 'gerenciarCooler'])->name('admin.cooler.manage');
+    Route::post('/admin/cooler/{id}/sensor', [AdminController::class, 'storeSensor'])->name('admin.sensor.store');
+    Route::delete('/admin/sensor/{id}', [AdminController::class, 'destroySensor'])->name('admin.sensor.destroy');
+
+    // --- Sistema ---
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

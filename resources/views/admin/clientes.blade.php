@@ -5,17 +5,23 @@
 
 @section('content')
 <main class="container">
-    <div class="form-card" style="max-width: 900px;">
+    <div class="form-card" style="max-width: 1000px;">
         <div class="titulo-pagina">
             <h2>Empresas Monitoradas</h2>
-            <p>Selecione um cliente para visualizar o status em tempo real da sua rede de frio.</p>
+            <p>Gerencie os equipamentos e visualize o status em tempo real.</p>
         </div>
 
-        <table class="tabela-alertas" style="margin-top: 20px;">
+        @if(session('sucesso'))
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-top: 15px; font-weight: bold;">
+                ✔ {{ session('sucesso') }}
+            </div>
+        @endif
+
+        <table class="tabela-alertas" style="margin-top: 20px; width: 100%;">
             <thead>
                 <tr>
-                    <th>Empresa / CNPJ</th>
-                    <th>Ação</th>
+                    <th style="text-align: left;">Empresa / CNPJ</th>
+                    <th style="text-align: right;">Ações de Gestão</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,10 +31,22 @@
                             <strong>{{ $empresa->razao_social }}</strong><br>
                             <small>{{ $empresa->cnpj ?? 'CNPJ Não Informado' }}</small>
                         </td>
-                        <td>
-                            <a href="#" class="btn-secundario" style="width: auto; height: auto; padding: 8px 15px; text-decoration: none; font-size: 0.9rem;">
-                                📊 Ver Geladeiras
+                        <td style="text-align: right;">
+                            
+                            <a href="{{ route('admin.cooler.create', $empresa->id) }}" class="btn-primario" style="padding: 6px 12px; text-decoration: none; font-size: 0.9rem;">
+                                + Novo Cooler
                             </a>
+                            
+                            <a href="{{ route('admin.empresa.dashboard', $empresa->id) }}" class="btn-secundario" style="padding: 6px 12px; text-decoration: none; font-size: 0.9rem; margin-left: 5px;">
+                                📈 Gráficos
+                            </a>
+                            
+                            @foreach($empresa->equipamentos as $equipamento)
+                                <a href="{{ route('admin.cooler.manage', $equipamento->id) }}" class="btn-secundario" style="padding: 6px 12px; text-decoration: none; font-size: 0.9rem; margin-left: 5px; background-color: #333; color: white;">
+                                    ⚙️ Configurar
+                                </a>
+                            @endforeach
+
                         </td>
                     </tr>
                 @empty

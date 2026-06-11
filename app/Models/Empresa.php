@@ -20,4 +20,10 @@ class Empresa extends Model
     {
         return $this->hasMany(Usuario::class);
     }
+
+    // Uma empresa tem muitos equipamentos (geladeiras)
+    public function equipamentos()
+    {
+        return $this->hasMany(Equipamento::class);
+    }
 }

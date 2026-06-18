@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ===================================================================== RELATÓRIO DOS EQUIPAMENTOS ===================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Relatórios | THERMO PREDICT')
 @section('subtitle', 'Central de Relatórios e Monitoramento Operacional')
@@ -11,18 +12,18 @@
 <main class="container">
 
     <section class="filtros-relatorio">
-        <div class="campo-filtro">
-            <label for="filtroEquipamento">Equipamento</label>
+        <div class="campo-filtro"> 
+            <label for="filtroEquipamento">Equipamento</label> <!--- FILTRO DE RELATÓRIO POR EQUIPAMENTO --->
             <select id="filtroEquipamento">
                 <option value="todos">Todos</option>
-                <option value="Geladeira 01">Geladeira 01</option>
-                <option value="Geladeira 02">Geladeira 02</option>
-                <option value="Freezer Central">Freezer Central</option>
+                <option value="Cooler A">Cooler A</option>
+                <option value="Cooler B">Cooler B</option>
+                <option value="Cooler C">Cooler C</option>
             </select>
         </div>
 
-        <div class="campo-filtro">
-            <label for="filtroStatus">Status</label>
+        <div class="campo-filtro"> 
+            <label for="filtroStatus">Status</label> <!--- FILTRO DE RELATÓRIO POR STATUS --->
             <select id="filtroStatus">
                 <option value="todos">Todos</option>
                 <option value="Normal">Normal</option>
@@ -35,15 +36,15 @@
             <label for="filtroSensor">Sensor</label>
             <select id="filtroSensor">
                 <option value="todos">Todos</option>
-                <option value="Temperatura">Temperatura</option>
+                <option value="Temperatura-interna">Temperatura interna</option>
+                <option value="Temperatura-externa">Umidade externo</option>
                 <option value="Porta">Porta</option>
                 <option value="Energia">Energia</option>
-                <option value="Backup">Backup</option>
             </select>
-        </div>
+        </div> 
 
         <div class="campo-filtro">
-            <label for="filtroPorta">Porta</label>
+            <label for="filtroPorta">Porta</label> <!--- FILTRO DE RELATÓRIO STATUS PORTA --->
             <select id="filtroPorta">
                 <option value="todos">Todos</option>
                 <option value="Aberta">Aberta</option>
@@ -52,7 +53,7 @@
         </div>
 
         <div class="campo-filtro">
-            <label for="filtroPeriodo">Período</label>
+            <label for="filtroPeriodo">Período</label> <!--- FILTRO DE RELATÓRIO POR PERÍODO --->
             <select id="filtroPeriodo">
                 <option value="todos">Todo o Dia</option>
                 <option value="manha">Manhã</option>
@@ -64,36 +65,36 @@
 
     <section class="cards-relatorio">
         <div class="card-relatorio">
-            <h3>Total de Alertas</h3>
+            <h3>Total de Alertas</h3> <!--- TOTAL DE ALERTAS --->
             <p id="totalAlertas">0</p>
         </div>
 
         <div class="card-relatorio">
-            <h3>Ocorrências Críticas</h3>
+            <h3>Ocorrências Críticas</h3> <!--- TOTAL DE OCORRÊNCIAS CRÍTICAS --->
             <p id="totalCriticos">0</p>
         </div>
 
         <div class="card-relatorio">
-            <h3>Temperatura Média</h3>
+            <h3>Temperatura Média</h3> <!--- MÉDIA DE TEMPERATURA --->
             <p id="mediaTemp">0°C</p>
         </div>
 
         <div class="card-relatorio">
-            <h3>Tempo Médio Porta Aberta</h3>
+            <h3>Tempo Médio Porta Aberta</h3> <!--- MÉDIA DE TEMPO DE ABERTURA DE PORTA --->
             <p id="tempoPorta">0 min</p>
         </div>
     </section>
 
     <section class="linha-relatorios">
         <div class="grafico-relatorio">
-            <h3>Temperatura por Equipamento</h3>
+            <h3>Temperatura por Equipamento</h3> <!--- TEMPERATURA POR EQUIPAMENTO --->
             <div class="grafico-wrapper">
                 <canvas id="graficoTemperatura"></canvas>
             </div>
         </div>
 
         <div class="grafico-relatorio">
-            <h3>Status Operacional</h3>
+            <h3>Status Operacional</h3> <!--- STATUS OPERACIONAL --->
             <div class="grafico-wrapper">
                 <canvas id="graficoStatus"></canvas>
             </div>
@@ -105,7 +106,7 @@
             <h2>Histórico Operacional</h2>
         </div>
 
-        <div class="tabela-scroll">
+        <div class="tabela-scroll"> <!--- HISTÓRIO COMO TABELA --->
             <table class="tabela-alertas">
                 <thead>
                     <tr>
@@ -126,5 +127,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/relatorios.js') }}"></script>
+    <script defer src="/assets/js/relatorios.js"></script> <!--- Link do JavaScript dos relatórios --->
 @endpush

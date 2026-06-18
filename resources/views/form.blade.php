@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ====================================================================== FORMULÁRIO DE CHAMADO ====================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Novo Chamado | THERMO PREDICT')
 @section('subtitle', 'Abertura de Chamados Técnicos')
@@ -14,13 +15,15 @@
         <form action="{{ route('chamados.store') }}" method="POST">
             @csrf
             
+            <!--- EQUIPAMENTO --->
             <label for="equipamento">Equipamento</label>
             <select id="equipamento" name="equipamento_id" required>
-                <option value="1">Geladeira A</option>
-                <option value="2">Geladeira B</option>
-                <option value="3">Freezer Laboratório</option>
+                <option value="1">Cooler A</option>
+                <option value="2">Cooler B</option>
+                <option value="3">Cooler C</option>
             </select>
 
+            <!--- PRIORIDADE --->
             <label for="prioridade">Prioridade</label>
             <select id="prioridade" name="prioridade" required>
                 <option value="baixa">Baixa</option>
@@ -29,6 +32,7 @@
                 <option value="critica">Crítica</option>
             </select>
 
+            <!--- DESCRIÇÃO --->
             <label for="descricao">Descrição</label>
             <textarea id="descricao" name="descricao" placeholder="Descreva o problema encontrado com os sensores..." required></textarea>
 

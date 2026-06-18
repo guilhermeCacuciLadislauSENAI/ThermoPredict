@@ -1,3 +1,4 @@
+<!--- ========================================================= VIEW DE ESPERA AGUARDANDO VALIDAÇÃO APÓS CADASTRO ========================================================= --->
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -5,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THERMO PREDICT | Aguardando Ativação</title>
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+    <link rel="stylesheet" href="/assets/css/auth.css">
     <style>
         .waiting-container {
             background-color: #fff;

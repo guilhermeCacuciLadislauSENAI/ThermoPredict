@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ==================================================================== GERENCIAR COOLER POR EMPRESA ==================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Gerenciar Equipamento | THERMO PREDICT')
 @section('subtitle', 'Painel Administrativo - Configuração de Sensores')
@@ -26,6 +27,7 @@
         <p><strong>Data de Registro:</strong> {{ $cooler->created_at->format('d/m/Y H:i') }}</p>
     </div>
 
+    <!-- FORMULÁRTIO DESNECESSÁRIO
     <div class="form-card" style="max-width: 700px; margin: 0 auto 20px auto;">
         <h3 style="margin-bottom: 15px;">🔌 Adicionar Novo Sensor</h3>
         
@@ -43,18 +45,19 @@
             </div>
 
             <div class="campo-input">
-                <label for="limite_min">Limite Mínimo</label>
+                <label for="limite_min">Limite Mínimo</label> 
                 <input type="number" step="0.1" id="limite_min" name="limite_min" placeholder="Ex: 2.0" required>
             </div>
 
             <div class="campo-input">
-                <label for="limite_max">Limite Máximo</label>
+                <label for="limite_max">Limite Máximo</label> 
                 <input type="number" step="0.1" id="limite_max" name="limite_max" placeholder="Ex: 8.0" required>
             </div>
 
             <button type="submit" class="btn-primario" style="margin-top: 10px;">Salvar Sensor</button>
         </form>
     </div>
+    -->
 
     <div class="form-card" style="max-width: 700px; margin: 0 auto 40px auto;">
         <h3 style="margin-bottom: 15px;">📡 Sensores Acoplados</h3>

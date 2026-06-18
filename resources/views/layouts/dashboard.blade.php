@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ===================================================================== DASHBOARD POR EQUIPAMENTO ===================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Dashboard | THERMO PREDICT')
 @section('header_subtitle', 'Monitoramento Inteligente da Cadeia Fria de Vacinas')
@@ -12,11 +13,11 @@
     <section class="filtros-box">
         <div class="filtro-item">
             <label>Equipamento</label>
-            <select id="filtroEquipamento">
+            <select id="filtroEquipamento"> <!--- FILTRO POR EQUIPAMENTO --->
                 <option value="todos">Todos</option>
-                <option value="Geladeira A">Geladeira A</option>
-                <option value="Geladeira B">Geladeira B</option>
-                <option value="Freezer Laboratório">Freezer Laboratório</option>
+                <option value="Cooler A">Cooler A</option>
+                <option value="Cooler B">Cooler B</option>
+                <option value="Cooler C">Cooler C</option>
             </select>
         </div>
         <div class="filtro-item">
@@ -30,9 +31,9 @@
         </div>
     </section>
 
-    </main>
+</main>
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/script.js') }}"></script>
+    <script src="/assets/js/script.js"></script> <!--- Link do JavaScript --->
 @endpush

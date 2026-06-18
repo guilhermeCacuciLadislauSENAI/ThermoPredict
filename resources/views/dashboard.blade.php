@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ======================================================================== DASHBOARD PRINCIPAL ======================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Dashboard | THERMO PREDICT')
 @section('subtitle', 'Monitoramento em Tempo Real - ' . $empresa->razao_social)
@@ -33,7 +34,7 @@
                     <strong>Local Operacional:</strong> {{ $cooler->localizacao ?? 'Não especificado' }}
                 </p>
                 
-                <div class="detalhes-sensores">
+                <div class="detalhes-sensores"> <!--- COLETANDO DADOS DO SENSOR --->
                     @forelse($cooler->sensores as $sensor)
                         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
                             <p style="margin: 0 0 15px 0; font-weight: 600; color: #334155; display: flex; justify-content: space-between;">

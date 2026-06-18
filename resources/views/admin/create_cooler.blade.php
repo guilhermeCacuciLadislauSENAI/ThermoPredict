@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ================================================================== ADICIONANDO COOLER PARA EMPRESA ================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Novo Cooler | THERMO PREDICT')
 @section('subtitle', 'Painel Administrativo - Cadastro de Equipamentos')
@@ -15,17 +16,17 @@
             @csrf
 
             <div class="campo-input">
-                <label for="nome">Identificação do Cooler</label>
+                <label for="nome">Identificação do Cooler</label> <!--- ENTRADA DA IDENTIFICAÇÃO DO COOLER --->
                 <input type="text" id="nome" name="nome" placeholder="Ex: Cooler Portátil Vacinas #04" required>
             </div>
 
             <div class="campo-input">
-                <label for="localizacao">Setor / Localização</label>
+                <label for="localizacao">Setor / Localização</label> <!--- ENTRADA DA LOCALIZAÇÃO DO COOLER --->
                 <input type="text" id="localizacao" name="localizacao" placeholder="Ex: Ambulância A">
             </div>
 
             <div class="campo-input">
-                <label for="status">Status Inicial</label>
+                <label for="status">Status Inicial</label> <!--- ENTRADA DO STATUS INICIAL DO COOLER --->
                 <select id="status" name="status" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
                     <option value="Ativo">Ativo (Em monitoramento)</option>
                     <option value="Em Manutenção">Em Manutenção</option>
@@ -34,8 +35,8 @@
             </div>
 
             <div style="display: flex; gap: 15px; margin-top: 20px;">
-                <button type="submit" class="btn-primario" style="flex: 2;">Salvar Dispositivo</button>
-                <a href="{{ route('admin.clientes') }}" class="btn-secundario" style="flex: 1; text-align: center; text-decoration: none; line-height: 40px; padding: 0;">Cancelar</a>
+                <button type="submit" class="btn-primario" style="flex: 2;">Salvar Dispositivo</button> <!--- SUBMIT DO FORMULÁRIO --->
+                <a href="{{ route('admin.clientes') }}" class="btn-secundario" style="flex: 1; text-align: center; text-decoration: none; line-height: 40px; padding: 0;">Cancelar</a> <!--- CANCELA A AÇÃO DE ADICIONAR UM NOVO COOLER --->
             </div>
         </form>
     </div>

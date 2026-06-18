@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ===================================================================== GERENCIAMENTO DE CLIENTES ===================================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Clientes | THERMO PREDICT')
 @section('subtitle', 'Painel Administrativo - Visão Geral de Empresas')
@@ -25,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($empresas as $empresa)
+                @forelse ($empresas as $empresa) <!--- LISTANDO EMPRESAS/CLIENTES --->
                     <tr>
                         <td>
                             <strong>{{ $empresa->razao_social }}</strong><br>
@@ -51,7 +52,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="2" style="text-align: center; padding: 30px;">
+                        <td colspan="2" style="text-align: center; padding: 30px;"> <!--- NENHUMA EMPRESA/CLIENTE --->
                             Nenhum cliente ativo no momento.
                         </td>
                     </tr>

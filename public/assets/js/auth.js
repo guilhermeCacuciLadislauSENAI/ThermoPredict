@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 razaoInput.value = "Buscando Razão Social...";
                 razaoInput.disabled = true;
 
-                fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`)
+                fetch(`https://brasilapi.com.br/api/cnpj/v1/${cnpjLimpo}`) // API PARA VERIFICAÇÃO DE CNPJ
+
                     .then(res => {
                         if (!res.ok) throw new Error("CNPJ não localizado ou falha na API.");
                         return res.json();

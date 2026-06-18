@@ -1,3 +1,4 @@
+<!--- =================================================================== FORMULÁRIO DE LOGIN E CADASTRO =================================================================== --->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -5,13 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THERMO PREDICT | Acesso</title>
     
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)">
+    <!--- API  --->
+    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)"> 
     
-    <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
+    <link rel="stylesheet" href="/assets/css/auth.css"> <!--- Link do css --->
 </head>
+
 <body>
     <div class="container @if($errors->any() && !$errors->has('login_error')) right-panel-active @endif" id="container">
         
+        <!--- CADASTRO --->
         <div class="form-container sign-up-container">
             <form action="{{ route('register.post') }}" method="POST">
                 @csrf
@@ -51,18 +55,21 @@
             </form>
         </div>
 
+        <!--- LOGIN --->
         <div class="form-container sign-in-container">
             <form action="{{ route('login.post') }}" method="POST">
                 @csrf
                 <h1>Entrar no Sistema</h1>
                 <p>Monitore sua cadeia fria em tempo real</p>
 
+                <!--- TRATATIVA DE ERRO DE LOGIN --->
                 @if ($errors->has('login_error'))
                     <div class="alert-error">
                         {{ $errors->first('login_error') }}
                     </div>
                 @endif
 
+                <!--- ENTRADA DO E-MAIL E SENHA --->
                 <div class="input-group">
                     <i class="fa-solid fa-envelope"></i>
                     <input type="email" name="email" placeholder="E-mail corporativo" required>
@@ -71,11 +78,12 @@
                     <i class="fa-solid fa-lock"></i>
                     <input type="password" name="password" placeholder="Senha" required>
                 </div>
-                <a href="#" class="forgot-password">Esqueceu sua senha?</a>
-                <button type="submit" class="btn-primary">Acessar</button>
+                <a href="#" class="forgot-password">Esqueceu sua senha?</a> <!--- RECUPERAR SENHA --->
+                <button type="submit" class="btn-primary">Acessar</button> <!--- ENVIO DO FORMUÁRIO --->
             </form>
         </div>
 
+        <!--- ALTERNÂNCIA DE TELAS ENTRE "LOGIN" E "CADASTRO" --->
         <div class="overlay-container">
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
@@ -92,6 +100,6 @@
         </div>
     </div>
 
-    <script src="{{ asset('js/auth.js') }}"></script>
+    <script defer src="/assets/js/auth.js"></script> <!--- Link do JavaScript para verificar permissão do usuário --->
 </body>
 </html>

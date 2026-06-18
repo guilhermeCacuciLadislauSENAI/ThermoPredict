@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<!--- ===================================================== VIEW DE EMPRESAS PENDENTES AGUARDANDO VALIDAÇÃO/APROVAÇÃO  ===================================================== --->
+@extends('layouts.index')
 
 @section('title', 'Aprovação de Clientes | THERMO PREDICT')
 @section('subtitle', 'Painel Administrativo - Gestão de Acessos')
@@ -17,7 +18,7 @@
                 </div>
             @endif
 
-            <table class="tabela-alertas" style="margin-top: 20px;">
+            <table class="tabela-alertas" style="margin-top: 20px;"> <!--- LISTANDO EMPRESAS AGUARDANDO APROVAÇÃO DE ACESSO --->
                 <thead>
                     <tr>
                         <th>Empresa / CNPJ</th>
@@ -41,7 +42,7 @@
                                     <button type="submit" class="status-ok"
                                         style="border: none; cursor: pointer; padding: 8px 15px;">
                                         Aprovar Acesso
-                                    </button>
+                                    </button> <!--- SUBMIT PARA APROVAR ACESSO DA EMPRESA --->
                                 </form>
                             </td>
                         </tr>

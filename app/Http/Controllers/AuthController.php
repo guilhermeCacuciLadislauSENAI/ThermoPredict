@@ -10,7 +10,7 @@ use App\Models\Usuario;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(Request $request) // Função de verificação e cadastro de um novo usuário/empresa
     {
         $request->validate([
             'cnpj' => 'nullable|string|max:18',
@@ -39,7 +39,7 @@ class AuthController extends Controller
         return redirect()->route('aguardando.ativacao');
     }
 
-    public function login(Request $request)
+    public function login(Request $request) // Função autenticadora para o login
     {
         $credentials = $request->validate([
             'email' => 'required|string|email',
@@ -67,7 +67,7 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request) // Função para o logout
     {
         Auth::logout();
         $request->session()->invalidate();

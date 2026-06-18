@@ -27,7 +27,7 @@
         <p><strong>Data de Registro:</strong> {{ $cooler->created_at->format('d/m/Y H:i') }}</p>
     </div>
 
-    <!-- FORMULÁRTIO DESNECESSÁRIO
+    <!--                                                               FORMULÁRIO DESNECESSÁRIO
     <div class="form-card" style="max-width: 700px; margin: 0 auto 20px auto;">
         <h3 style="margin-bottom: 15px;">🔌 Adicionar Novo Sensor</h3>
         

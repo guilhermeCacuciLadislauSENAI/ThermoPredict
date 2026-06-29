@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Sensor;
+use App\Models\LogTelemetria;
 use App\Models\Usuario;
 use App\Services\TelemetriaPredictionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,6 +83,47 @@ class MonitoringPagesTest extends TestCase
             ->assertHeader('Content-Type', 'text/csv; charset=UTF-8')
             ->assertSee('Analise Preditiva', false)
             ->assertSee('Resumo', false);
+    }
+
+    public function test_dashboard_simulation_can_be_toggled_and_generates_readings(): void
+    {
+        $this->seed();
+        $user = Usuario::where('email', 'cliente@thermo.test')->firstOrFail();
+        $initialCount = LogTelemetria::count();
+
+        $this->actingAs($user)
+            ->post(route('dashboard.simulation'), ['active' => 1])
+            ->assertRedirect(route('dashboard'));
+
+        $this->assertGreaterThan($initialCount, LogTelemetria::count());
+        $latest = LogTelemetria::latest('created_at')->firstOrFail();
+        $this->assertNotNull($latest->temperatura_externa);
+        $this->assertNotNull($latest->umidade_externa);
+        $this->assertIsBool($latest->tampa_aberta);
+        $countAfterStart = LogTelemetria::count();
+
+        $this->travel(6)->seconds();
+
+        $this->actingAs($user)
+            ->post(route('dashboard.simulation.tick'))
+            ->assertOk()
+            ->assertJsonPath('active', true);
+
+        $this->assertGreaterThan($countAfterStart, LogTelemetria::count());
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Desativar simula&ccedil;&atilde;o', false);
+
+        $this->actingAs($user)
+            ->post(route('dashboard.simulation'), ['active' => 0])
+            ->assertRedirect(route('dashboard'));
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Ativar simula&ccedil;&atilde;o', false);
     }
 
     public function test_prediction_service_projects_sensor_trend_from_history(): void

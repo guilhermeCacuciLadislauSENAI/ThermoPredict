@@ -149,6 +149,7 @@
 
             const labels = series.labels || [];
             const values = series.values || [];
+            const externalValues = series.external_values || [];
             const datasets = [{
                 label: 'Leitura',
                 data: values,
@@ -159,6 +160,19 @@
                 tension: 0.35,
                 pointRadius: 3
             }];
+
+            if (externalValues.some(value => value !== null && value !== undefined)) {
+                datasets.push({
+                    label: 'Temp. externa',
+                    data: externalValues,
+                    borderColor: colors.gray,
+                    borderDash: [3, 4],
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.25,
+                    pointRadius: 2
+                });
+            }
 
             if (series.projection && series.projection.length) {
                 datasets.push({

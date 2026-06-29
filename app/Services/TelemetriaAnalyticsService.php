@@ -193,8 +193,20 @@ class TelemetriaAnalyticsService
     private function buildStats(Collection $equipamentos, Collection $sensores, Collection $logs, Collection $predictions, Collection $occurrences): array
     {
         $values = $logs->pluck('valor_leitura')->map(fn ($value) => (float) $value);
+        $externalValues = $logs
+            ->pluck('temperatura_externa')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value);
+        $humidityValues = $logs
+            ->pluck('umidade_externa')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value);
         $alertas = $logs->filter(fn (LogTelemetria $log) => $this->riskLevel($log->nivel_risco) !== 'normal');
         $criticos = $logs->filter(fn (LogTelemetria $log) => $this->riskLevel($log->nivel_risco) === 'critico');
+        $tampaAberta = $logs->filter(fn (LogTelemetria $log) => (bool) $log->tampa_aberta);
+        $tampaAbertaRecente = $logs
+            ->filter(fn (LogTelemetria $log) => $log->created_at->gte(now()->subDay()))
+            ->filter(fn (LogTelemetria $log) => (bool) $log->tampa_aberta);
         $sensoresSemLeitura = $sensores->filter(fn (Sensor $sensor) => ! $sensor->logs || $sensor->logs->isEmpty());
         $latest = $logs->sortByDesc('created_at')->first();
 
@@ -209,6 +221,10 @@ class TelemetriaAnalyticsService
             'temperatura_media' => $values->isEmpty() ? null : round((float) $values->avg(), 1),
             'temperatura_minima' => $values->isEmpty() ? null : round((float) $values->min(), 1),
             'temperatura_maxima' => $values->isEmpty() ? null : round((float) $values->max(), 1),
+            'temperatura_externa_media' => $externalValues->isEmpty() ? null : round((float) $externalValues->avg(), 1),
+            'umidade_externa_media' => $humidityValues->isEmpty() ? null : round((float) $humidityValues->avg(), 1),
+            'tampa_aberta_total' => $tampaAberta->count(),
+            'tampa_aberta_recente' => $tampaAbertaRecente->count(),
             'ultima_leitura' => $latest?->created_at,
             'score_geral' => $predictions->isEmpty() ? 0 : (int) round($predictions->avg('risk_score')),
             'maior_score' => $predictions->max('risk_score') ?? 0,
@@ -263,6 +279,14 @@ class TelemetriaAnalyticsService
     private function buildReportSummary(Collection $logs, Collection $occurrences): array
     {
         $values = $logs->pluck('valor_leitura')->map(fn ($value) => (float) $value);
+        $externalValues = $logs
+            ->pluck('temperatura_externa')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value);
+        $humidityValues = $logs
+            ->pluck('umidade_externa')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value);
 
         return [
             'leituras' => $logs->count(),
@@ -271,6 +295,9 @@ class TelemetriaAnalyticsService
             'media' => $values->isEmpty() ? null : round((float) $values->avg(), 1),
             'minima' => $values->isEmpty() ? null : round((float) $values->min(), 1),
             'maxima' => $values->isEmpty() ? null : round((float) $values->max(), 1),
+            'temperatura_externa_media' => $externalValues->isEmpty() ? null : round((float) $externalValues->avg(), 1),
+            'umidade_externa_media' => $humidityValues->isEmpty() ? null : round((float) $humidityValues->avg(), 1),
+            'tampa_aberta' => $logs->filter(fn (LogTelemetria $log) => (bool) $log->tampa_aberta)->count(),
             'sensores' => $logs->pluck('sensor_id')->unique()->count(),
             'ocorrencias' => $occurrences->count(),
             'tempo_fora_faixa' => (int) $occurrences->sum('duration_minutes'),
@@ -511,6 +538,9 @@ class TelemetriaAnalyticsService
     {
         $logs = $sensor->logs->sortBy('created_at')->take(-30)->values();
         $values = $logs->map(fn (LogTelemetria $log) => (float) $log->valor_leitura)->values();
+        $externalValues = $logs->map(fn (LogTelemetria $log) => $log->temperatura_externa === null ? null : (float) $log->temperatura_externa)->values();
+        $humidityValues = $logs->map(fn (LogTelemetria $log) => $log->umidade_externa === null ? null : (float) $log->umidade_externa)->values();
+        $lidOpen = $logs->map(fn (LogTelemetria $log) => (bool) $log->tampa_aberta)->values();
         $labels = $logs->map(fn (LogTelemetria $log) => $log->created_at->format('H:i'))->values();
         $projectionValues = [];
 
@@ -525,6 +555,9 @@ class TelemetriaAnalyticsService
             'label' => $this->sensorLabel($sensor),
             'labels' => $projectionValues ? $labels->concat(['+2h', '+4h'])->values() : $labels,
             'values' => $projectionValues ? $values->concat([null, null])->values() : $values,
+            'external_values' => $projectionValues ? $externalValues->concat([null, null])->values() : $externalValues,
+            'humidity_values' => $projectionValues ? $humidityValues->concat([null, null])->values() : $humidityValues,
+            'lid_open' => $projectionValues ? $lidOpen->concat([false, false])->values() : $lidOpen,
             'projection' => $projectionValues,
             'limit_min' => $sensor->limite_min === null ? 2.0 : (float) $sensor->limite_min,
             'limit_max' => $sensor->limite_max === null ? 8.0 : (float) $sensor->limite_max,

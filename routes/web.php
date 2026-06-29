@@ -20,6 +20,8 @@ Route::middleware(['auth'])->group(function () {
 
     // --- Módulo Cliente (B2B) ---
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/simulacao', [DashboardController::class, 'simulation'])->name('dashboard.simulation');
+    Route::post('/dashboard/simulacao/leituras', [DashboardController::class, 'simulationTick'])->name('dashboard.simulation.tick');
     Route::get('/dashboard/exportar/pdf', [DashboardController::class, 'pdf'])->name('dashboard.pdf');
     Route::get('/dashboard/exportar/csv', [DashboardController::class, 'csv'])->name('dashboard.csv');
     Route::get('/predicao', [PredicaoController::class, 'index'])->name('predicao');

@@ -21,6 +21,8 @@ class ReportPayloadService
                 'Temperatura media' => $this->temperature($dashboard['stats']['temperatura_media']),
                 'Maior temperatura' => $this->temperature($dashboard['stats']['temperatura_maxima'] ?? null),
                 'Menor temperatura' => $this->temperature($dashboard['stats']['temperatura_minima'] ?? null),
+                'Temp. externa media' => $this->temperature($dashboard['stats']['temperatura_externa_media'] ?? null),
+                'Umidade externa media' => $this->percent($dashboard['stats']['umidade_externa_media'] ?? null),
                 'Sensores' => $dashboard['stats']['sensores_total'],
                 'Alertas' => $dashboard['stats']['alertas_total'],
                 'Score geral' => $dashboard['stats']['score_geral'].'/100',
@@ -50,6 +52,9 @@ class ReportPayloadService
                 'Temperatura media' => $this->temperature($report['summary']['media']),
                 'Minima' => $this->temperature($report['summary']['minima']),
                 'Maxima' => $this->temperature($report['summary']['maxima']),
+                'Temp. externa media' => $this->temperature($report['summary']['temperatura_externa_media'] ?? null),
+                'Umidade externa media' => $this->percent($report['summary']['umidade_externa_media'] ?? null),
+                'Aberturas de tampa' => $report['summary']['tampa_aberta'] ?? 0,
                 'Ocorrencias' => $report['summary']['ocorrencias'],
                 'Tempo fora da faixa' => $this->minutes($report['summary']['tempo_fora_faixa']),
             ]),
@@ -78,6 +83,8 @@ class ReportPayloadService
                 'Ocorrencias' => $prediction['stats']['ocorrencias_total'],
                 'Tempo fora da faixa' => $this->minutes($prediction['stats']['tempo_fora_faixa']),
                 'Temperatura media' => $this->temperature($prediction['stats']['temperatura_media']),
+                'Temp. externa media' => $this->temperature($prediction['stats']['temperatura_externa_media'] ?? null),
+                'Aberturas de tampa' => $prediction['stats']['tampa_aberta_recente'] ?? 0,
             ]),
             'analysis' => $this->predictionRows(collect($prediction['predictions'])),
             'chart_data' => $this->chartTables($prediction['charts']),
@@ -205,12 +212,15 @@ class ReportPayloadService
     {
         return [
             'title' => 'Leituras Exportadas',
-            'headers' => ['Data', 'Equipamento', 'Sensor', 'Leitura', 'Risco'],
+            'headers' => ['Data', 'Equipamento', 'Sensor', 'Temp. interna', 'Temp. externa', 'Umidade externa', 'Tampa', 'Risco'],
             'rows' => $logs->map(fn (LogTelemetria $log) => [
                 $log->created_at->format('d/m/Y H:i'),
                 $log->sensor?->equipamento?->nome ?? '',
                 $log->sensor?->tipo ?? '',
                 $this->temperature($log->valor_leitura),
+                $this->temperature($log->temperatura_externa),
+                $this->percent($log->umidade_externa),
+                $log->tampa_aberta ? 'Aberta' : 'Fechada',
                 $log->nivel_risco,
             ])->values()->all(),
         ];
@@ -219,6 +229,11 @@ class ReportPayloadService
     private function temperature(mixed $value): string
     {
         return $value === null ? '--' : number_format((float) $value, 1, ',', '.').' C';
+    }
+
+    private function percent(mixed $value): string
+    {
+        return $value === null ? '--' : number_format((float) $value, 1, ',', '.').'%';
     }
 
     private function minutes(int|float $minutes): string

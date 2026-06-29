@@ -100,6 +100,9 @@
         <article class="card-relatorio"><h3>Temperatura m&eacute;dia</h3><p>{{ $prediction['stats']['temperatura_media'] === null ? '--' : number_format($prediction['stats']['temperatura_media'], 1, ',', '.') . ' C' }}</p></article>
         <article class="card-relatorio"><h3>Maior temperatura</h3><p>{{ $prediction['stats']['temperatura_maxima'] === null ? '--' : number_format($prediction['stats']['temperatura_maxima'], 1, ',', '.') . ' C' }}</p></article>
         <article class="card-relatorio"><h3>Menor temperatura</h3><p>{{ $prediction['stats']['temperatura_minima'] === null ? '--' : number_format($prediction['stats']['temperatura_minima'], 1, ',', '.') . ' C' }}</p></article>
+        <article class="card-relatorio"><h3>Temp. externa m&eacute;dia</h3><p>{{ $prediction['stats']['temperatura_externa_media'] === null ? '--' : number_format($prediction['stats']['temperatura_externa_media'], 1, ',', '.') . ' C' }}</p></article>
+        <article class="card-relatorio"><h3>Umidade externa</h3><p>{{ $prediction['stats']['umidade_externa_media'] === null ? '--' : number_format($prediction['stats']['umidade_externa_media'], 1, ',', '.') . '%' }}</p></article>
+        <article class="card-relatorio"><h3>Tampa aberta hoje</h3><p>{{ $prediction['stats']['tampa_aberta_recente'] }}</p></article>
         <article class="card-relatorio"><h3>Vacinas em risco</h3><p>{{ $prediction['stats']['vacinas_em_risco'] }}</p></article>
         <article class="card-relatorio"><h3>Sensores sem comunica&ccedil;&atilde;o</h3><p>{{ $prediction['stats']['sensores_sem_comunicacao'] }}</p></article>
         <article class="card-relatorio"><h3>Ocorr&ecirc;ncias</h3><p>{{ $prediction['stats']['ocorrencias_total'] }}</p></article>
@@ -158,6 +161,9 @@
                     <p><strong>{{ $item['label'] }}:</strong> {{ $item['message'] }}</p>
                     <div class="prediction-metrics">
                         <span>Atual <b>{{ $item['current'] === null ? '--' : number_format($item['current'], 1, ',', '.') . ' C' }}</b></span>
+                        <span>Externa <b>{{ $item['external_temperature_current'] === null ? '--' : number_format($item['external_temperature_current'], 1, ',', '.') . ' C' }}</b></span>
+                        <span>Umid. <b>{{ $item['external_humidity_current'] === null ? '--' : number_format($item['external_humidity_current'], 1, ',', '.') . '%' }}</b></span>
+                        <span>Tampa <b>{{ $item['lid_open_current'] ? 'Aberta' : 'Fechada' }}</b></span>
                         <span>2h <b>{{ $item['predicted_2h'] === null ? '--' : number_format($item['predicted_2h'], 1, ',', '.') . ' C' }}</b></span>
                         <span>4h <b>{{ $item['predicted_4h'] === null ? '--' : number_format($item['predicted_4h'], 1, ',', '.') . ' C' }}</b></span>
                         <span>Chance <b>{{ $item['chance_excursion'] }}%</b></span>

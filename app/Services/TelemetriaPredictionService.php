@@ -38,6 +38,13 @@ class TelemetriaPredictionService
             'limit_max' => $maximum,
             'uses_default_range' => $sensor->limite_min === null || $sensor->limite_max === null,
             'current' => null,
+            'external_temperature_current' => null,
+            'external_humidity_current' => null,
+            'lid_open_current' => false,
+            'recent_lid_openings' => 0,
+            'external_temperature_avg' => null,
+            'external_humidity_avg' => null,
+            'context_risk' => 0,
             'predicted_2h' => null,
             'predicted_4h' => null,
             'trend_per_hour' => null,
@@ -75,6 +82,8 @@ class TelemetriaPredictionService
         $current = (float) $latest->valor_leitura;
         $base['current'] = round($current, 1);
         $base['latest_at'] = $latest->created_at;
+        $context = $this->contextIndicators($logs);
+        $base = array_merge($base, $context);
         $base['recent_alerts'] = $logs
             ->filter(fn (LogTelemetria $log) => $log->created_at->gte(now()->subDay()))
             ->filter(fn (LogTelemetria $log) => $this->isOutOfRange((float) $log->valor_leitura, $minimum, $maximum))
@@ -96,7 +105,8 @@ class TelemetriaPredictionService
                 recentAlerts: $base['recent_alerts'],
                 staleMinutes: $staleMinutes,
                 hoursToLimit: null,
-                volatility: 0
+                volatility: 0,
+                contextRisk: $base['context_risk']
             );
 
             return array_merge($base, [
@@ -125,7 +135,8 @@ class TelemetriaPredictionService
             recentAlerts: $base['recent_alerts'],
             staleMinutes: $staleMinutes,
             hoursToLimit: $hoursToLimit,
-            volatility: $volatility
+            volatility: $volatility,
+            contextRisk: $base['context_risk']
         );
 
         $result = array_merge($base, [
@@ -244,6 +255,7 @@ class TelemetriaPredictionService
         $hoursToLimit = $prediction['hours_to_limit'];
         $range = $this->formatNumber($minimum).' a '.$this->formatNumber($maximum);
         $limitText = $hoursToLimit === null ? '' : ' Limite estimado em '.$hoursToLimit.'h.';
+        $contextText = $this->contextMessage($prediction);
 
         $message = match ($status) {
             'normal' => 'Temperatura em '.$this->formatNumber($current).' dentro da faixa segura '.$range.'. Tendencia '.$direction.'.',
@@ -254,6 +266,10 @@ class TelemetriaPredictionService
             'desatualizado' => 'Sensor sem comunicacao recente. A ultima leitura valida pode nao representar a temperatura atual.',
             default => $prediction['message'],
         };
+
+        if ($contextText !== '') {
+            $message .= ' '.$contextText;
+        }
 
         return array_merge($prediction, [
             'status' => $status,
@@ -266,6 +282,14 @@ class TelemetriaPredictionService
 
     private function recommendation(string $status, float $trend, float $current, float $minimum, float $maximum, array $prediction): string
     {
+        if (($prediction['lid_open_current'] ?? false) === true) {
+            return 'Feche a tampa do cooler, confirme a vedacao e acompanhe a queda da temperatura nas proximas leituras.';
+        }
+
+        if (($prediction['recent_lid_openings'] ?? 0) >= 3) {
+            return 'Reduza aberturas sucessivas da tampa e confirme se o manuseio das vacinas esta seguindo o procedimento.';
+        }
+
         if ($status === 'perda_provavel') {
             return 'Coloque o lote em quarentena, acione o responsavel tecnico e gere relatorio da ocorrencia antes de liberar uso.';
         }
@@ -295,6 +319,27 @@ class TelemetriaPredictionService
         }
 
         return 'Operacao normal. Mantenha monitoramento automatico ativo.';
+    }
+
+    private function contextMessage(array $prediction): string
+    {
+        $parts = [];
+
+        if (($prediction['lid_open_current'] ?? false) === true) {
+            $parts[] = 'Tampa aberta na ultima leitura.';
+        } elseif (($prediction['recent_lid_openings'] ?? 0) > 0) {
+            $parts[] = 'Foram detectadas '.$prediction['recent_lid_openings'].' aberturas recentes da tampa.';
+        }
+
+        if (($prediction['external_temperature_current'] ?? null) !== null && $prediction['external_temperature_current'] >= 30) {
+            $parts[] = 'Ambiente externo quente em '.$this->formatNumber((float) $prediction['external_temperature_current']).'.';
+        }
+
+        if (($prediction['external_humidity_current'] ?? null) !== null && $prediction['external_humidity_current'] >= 75) {
+            $parts[] = 'Umidade externa elevada em '.number_format((float) $prediction['external_humidity_current'], 1, ',', '').'%.';
+        }
+
+        return implode(' ', $parts);
     }
 
     private function recentLogs(Sensor $sensor, ?Collection $logs): Collection
@@ -373,6 +418,50 @@ class TelemetriaPredictionService
         ];
     }
 
+    private function contextIndicators(Collection $logs): array
+    {
+        $latest = $logs->last();
+        $recent = $logs->filter(fn (LogTelemetria $log) => $log->created_at->gte(now()->subMinutes(30)));
+        $externalValues = $logs
+            ->pluck('temperatura_externa')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value);
+        $humidityValues = $logs
+            ->pluck('umidade_externa')
+            ->filter(fn ($value) => $value !== null)
+            ->map(fn ($value) => (float) $value);
+        $recentLidOpenings = $recent->filter(fn (LogTelemetria $log) => (bool) $log->tampa_aberta)->count();
+        $externalCurrent = $latest?->temperatura_externa;
+        $humidityCurrent = $latest?->umidade_externa;
+        $contextRisk = 0;
+
+        if ((bool) ($latest?->tampa_aberta ?? false)) {
+            $contextRisk += 14;
+        }
+
+        if ($recentLidOpenings > 0) {
+            $contextRisk += min(16, $recentLidOpenings * 3);
+        }
+
+        if ($externalCurrent !== null && (float) $externalCurrent >= 30) {
+            $contextRisk += min(10, ((float) $externalCurrent - 30) * 2);
+        }
+
+        if ($humidityCurrent !== null && (float) $humidityCurrent >= 75) {
+            $contextRisk += min(8, ((float) $humidityCurrent - 75) * .7);
+        }
+
+        return [
+            'external_temperature_current' => $externalCurrent === null ? null : round((float) $externalCurrent, 1),
+            'external_humidity_current' => $humidityCurrent === null ? null : round((float) $humidityCurrent, 1),
+            'lid_open_current' => (bool) ($latest?->tampa_aberta ?? false),
+            'recent_lid_openings' => $recentLidOpenings,
+            'external_temperature_avg' => $externalValues->isEmpty() ? null : round((float) $externalValues->avg(), 1),
+            'external_humidity_avg' => $humidityValues->isEmpty() ? null : round((float) $humidityValues->avg(), 1),
+            'context_risk' => (int) round($contextRisk),
+        ];
+    }
+
     private function riskScore(
         float $current,
         float $slope,
@@ -383,7 +472,8 @@ class TelemetriaPredictionService
         int $recentAlerts,
         int $staleMinutes,
         ?float $hoursToLimit,
-        float $volatility
+        float $volatility,
+        int $contextRisk
     ): int {
         $score = 0;
         $range = max(.1, $maximum - $minimum);
@@ -406,6 +496,7 @@ class TelemetriaPredictionService
         $score += min(20, $outMinutes / 6);
         $score += min(10, $recentAlerts * 2);
         $score += min(10, $volatility * 5);
+        $score += min(26, $contextRisk);
 
         if ($hoursToLimit !== null) {
             if ($hoursToLimit <= 1) {

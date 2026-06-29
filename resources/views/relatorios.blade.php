@@ -98,6 +98,18 @@
             <h3>Temperatura M&eacute;dia</h3>
             <p>{{ $report['summary']['media'] === null ? '--' : number_format($report['summary']['media'], 1, ',', '.') . ' C' }}</p>
         </article>
+        <article class="card-relatorio">
+            <h3>Temp. externa m&eacute;dia</h3>
+            <p>{{ $report['summary']['temperatura_externa_media'] === null ? '--' : number_format($report['summary']['temperatura_externa_media'], 1, ',', '.') . ' C' }}</p>
+        </article>
+        <article class="card-relatorio">
+            <h3>Umidade externa</h3>
+            <p>{{ $report['summary']['umidade_externa_media'] === null ? '--' : number_format($report['summary']['umidade_externa_media'], 1, ',', '.') . '%' }}</p>
+        </article>
+        <article class="card-relatorio">
+            <h3>Aberturas de tampa</h3>
+            <p>{{ $report['summary']['tampa_aberta'] }}</p>
+        </article>
     </section>
 
     <section class="cards-relatorio cards-relatorio-secundarios">
@@ -233,7 +245,10 @@
                         <th>Hor&aacute;rio</th>
                         <th>Equipamento</th>
                         <th>Sensor</th>
-                        <th>Leitura</th>
+                        <th>Temp. interna</th>
+                        <th>Temp. externa</th>
+                        <th>Umidade externa</th>
+                        <th>Tampa</th>
                         <th>Risco</th>
                     </tr>
                 </thead>
@@ -244,11 +259,14 @@
                             <td>{{ $log->sensor?->equipamento?->nome ?? '--' }}</td>
                             <td>{{ $log->sensor?->tipo ?? '--' }}</td>
                             <td>{{ number_format((float) $log->valor_leitura, 1, ',', '.') }} C</td>
+                            <td>{{ $log->temperatura_externa === null ? '--' : number_format((float) $log->temperatura_externa, 1, ',', '.') . ' C' }}</td>
+                            <td>{{ $log->umidade_externa === null ? '--' : number_format((float) $log->umidade_externa, 1, ',', '.') . '%' }}</td>
+                            <td>{{ $log->tampa_aberta ? 'Aberta' : 'Fechada' }}</td>
                             <td><span class="status-pill">{{ $log->nivel_risco }}</span></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5">Nenhum resultado encontrado para os filtros selecionados.</td>
+                            <td colspan="8">Nenhum resultado encontrado para os filtros selecionados.</td>
                         </tr>
                     @endforelse
                 </tbody>

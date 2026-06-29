@@ -71,10 +71,15 @@ class DatabaseSeeder extends Seeder
         $horaAtual = Carbon::now()->subHours(10);
         $temperaturasDemo = [4.5, 4.8, 5.1, 5.5, 6.2, 7.8, 8.5, 6.0, 5.0, 4.2];
 
-        foreach ($temperaturasDemo as $temp) {
+        foreach ($temperaturasDemo as $index => $temp) {
+            $tampaAberta = in_array($index, [5, 6], true);
+
             LogTelemetria::create([
                 'sensor_id' => $sensor->id,
                 'valor_leitura' => $temp,
+                'temperatura_externa' => 24.5 + ($index * 0.35) + ($tampaAberta ? 2.2 : 0),
+                'umidade_externa' => 58 + ($index * 1.1) + ($tampaAberta ? 6 : 0),
+                'tampa_aberta' => $tampaAberta,
                 'nivel_risco' => ($temp < 2.00 || $temp > 8.00) ? 'Critico' : 'Normal',
                 'created_at' => $horaAtual->addHour(),
             ]);
